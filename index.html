@@ -1,1 +1,160 @@
-<!-- Registration/Login HTML here -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Taskbaji</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 0; padding: 0; }
+    header, nav, main { padding: 10px; }
+    header { background-color: #4CAF50; color: white; text-align: center; }
+    #login, #dashboard, #task, #withdraw { display: none; }
+    .sidebar {
+      position: fixed; top: 0; left: 0; width: 200px; height: 100%;
+      background: #333; padding: 20px; color: white; display: none;
+    }
+    .sidebar button { display: block; margin: 10px 0; background: none; border: none; color: white; text-align: left; cursor: pointer; }
+    #menuBtn { position: absolute; top: 10px; right: 10px; }
+    .ad-box {
+      background: #eee; padding: 10px; margin: 20px 0; text-align: center;
+      border: 1px dashed #999;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>Taskbaji CAPTCHA Site</h1>
+  <div id="menuBtn"><button onclick="toggleSidebar()">Menu</button></div>
+</header>
+
+<div class="sidebar" id="sidebar">
+  <button onclick="showPage('dashboard')">Dashboard</button>
+  <button onclick="showPage('task')">Start Now</button>
+  <button onclick="showPage('withdraw')">Withdraw</button>
+  <button id="ownerBtn" style="display:none;" onclick="alert('Total Owner Income: ₹' + (totalPoints * 0.04).toFixed(2))">Owner Dashboard</button>
+  <button onclick="logout()">Exit</button>
+</div>
+
+<main>
+
+  <!-- Login/Register -->
+  <section id="login">
+    <h2>Register / Login</h2>
+    <input type="email" id="email" placeholder="Email"><br><br>
+    <input type="password" id="password" placeholder="Password"><br><br>
+    <button onclick="login()">Enter</button>
+  </section>
+
+  <!-- Dashboard -->
+  <section id="dashboard">
+    <h2>Dashboard</h2>
+    <p>Welcome, <span id="userEmail"></span></p>
+    <p><strong>Points:</strong> <span id="pointBalance">0</span></p>
+    <p><strong>INR Balance:</strong> ₹<span id="inrBalance">0.00</span></p>
+  </section>
+
+  <!-- CAPTCHA Task -->
+  <section id="task">
+    <h2>Solve CAPTCHA</h2>
+    <p id="captchaQ"></p>
+    <input type="number" id="captchaA" placeholder="Answer">
+    <button onclick="checkCaptcha()">Submit</button>
+    <p id="captchaMsg"></p>
+
+    <div class="ad-box">[Your Ads Here – Addsera Placeholder]</div>
+  </section>
+
+  <!-- Withdraw -->
+  <section id="withdraw">
+    <h2>Withdraw Request</h2>
+    <p>Minimum ₹100 required to withdraw.</p>
+    <button onclick="withdraw()">Request Withdraw</button>
+    <p id="withdrawMsg"></p>
+  </section>
+
+</main>
+
+<script>
+  let user = null;
+  let totalPoints = 0;
+
+  const captchaElement = document.getElementById("captchaQ");
+  const captchaAnswer = document.getElementById("captchaA");
+  const captchaMsg = document.getElementById("captchaMsg");
+
+  let correctAnswer = 0;
+
+  function toggleSidebar() {
+    const sb = document.getElementById("sidebar");
+    sb.style.display = sb.style.display === "block" ? "none" : "block";
+  }
+
+  function showPage(pageId) {
+    ['login','dashboard','task','withdraw'].forEach(id => {
+      document.getElementById(id).style.display = "none";
+    });
+    document.getElementById(pageId).style.display = "block";
+    if(pageId === "dashboard") updateDashboard();
+    if(pageId === "task") generateCaptcha();
+  }
+
+  function login() {
+    const email = document.getElementById("email").value;
+    const pass = document.getElementById("password").value;
+
+    if(email && pass) {
+      user = email;
+      if(email === "shamindranathroy681@gmail.com" && pass === "S89000r&") {
+        document.getElementById("ownerBtn").style.display = "block";
+      }
+      document.getElementById("userEmail").innerText = email;
+      showPage("dashboard");
+    } else {
+      alert("Enter valid credentials.");
+    }
+  }
+
+  function updateDashboard() {
+    document.getElementById("pointBalance").innerText = totalPoints;
+    document.getElementById("inrBalance").innerText = (totalPoints * 0.04).toFixed(2);
+  }
+
+  function generateCaptcha() {
+    const a = Math.floor(Math.random() * 20);
+    const b = Math.floor(Math.random() * 20);
+    correctAnswer = a + b;
+    captchaElement.innerText = `What is ${a} + ${b}?`;
+    captchaAnswer.value = '';
+    captchaMsg.innerText = '';
+  }
+
+  function checkCaptcha() {
+    const userAns = parseInt(captchaAnswer.value);
+    if(userAns === correctAnswer) {
+      totalPoints += 1;
+      captchaMsg.innerText = "Correct! +1 Point";
+      updateDashboard();
+      generateCaptcha();
+    } else {
+      captchaMsg.innerText = "Wrong Answer!";
+    }
+  }
+
+  function withdraw() {
+    if(totalPoints * 0.04 >= 100) {
+      document.getElementById("withdrawMsg").innerText = "Withdraw request sent to admin.";
+    } else {
+      document.getElementById("withdrawMsg").innerText = "Not enough balance to withdraw.";
+    }
+  }
+
+  function logout() {
+    location.reload();
+  }
+
+  // Show login on load
+  showPage("login");
+</script>
+
+</body>
+                                                         </html>
